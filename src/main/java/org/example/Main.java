@@ -23,22 +23,46 @@ public class Main {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
         try {
-        driver.findElement(By.xpath("//a[@title='Cricket Teams']")).click();
+            driver.findElement(By.xpath("//a[@title='Cricket Teams']")).click();
             wait.until(ExpectedConditions.elementToBeClickable(
                     By.xpath("//a[contains(@href,'/cricket-team/india')]"))).click();
-        Thread.sleep(2000);
-        driver.findElement(By.xpath("//a[@title='Stats']")).click();
-        System.out.println("Successfully navigated to Stats");
-        Thread.sleep(3000);
-        List<WebElement> kholi = driver.findElements(By.xpath("//table[@class='w-full text-xs wb:text-sm']/tbody/tr[1]"));
-        System.out.println(kholi.get(1).getText());
-        }
-        catch (Exception e){
-            e.printStackTrace();
+            Thread.sleep(2000);
+            driver.findElement(By.xpath("//a[@title='Stats']")).click();
+            System.out.println("Successfully navigated to Stats");
+            Thread.sleep(3000);
+            List<WebElement> rows = driver.findElements(By.xpath("//table[@class='w-full text-xs wb:text-sm']/tbody/tr"));
+            int rowCount = rows.size();
+            String[] names = new String[rowCount];
+            String[] avg = new String[rowCount];
+
+            //Store data into arrays
+            for (int i = 0; i < rowCount; i++) {
+                names[i] = rows.get(i).findElement(By.xpath("./td[1]")).getText();
+                avg[i] = rows.get(i).findElement(By.xpath("./td[5]")).getText();
             }
-        finally {
+            //Compare AVG scores
+            boolean matchFound = false;
+
+            for (int i = 0; i < rowCount; i++) {
+                for (int j = i + 1; j < rowCount; j++) {
+
+                    if (avg[i].equals(avg[j])) {
+                        System.out.println("Same avg: " + avg[i]);
+                        System.out.println("Players: " + names[i] + " , " + names[j]);
+                        matchFound = true;
+                    }
+                }
+            }
+
+            if (!matchFound) {
+                System.out.println("Nothing like that");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
             driver.quit();
         }
+
 
     }
 }
